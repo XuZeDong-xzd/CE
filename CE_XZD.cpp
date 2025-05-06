@@ -8,17 +8,17 @@
 using namespace cv;
 using namespace std;
 
-#define WIDTH 640 //Ö¸¶¨Í¼ÏñµÄ¿í¶È£¬¼´cols
-#define HEIGHT 512 //Ö¸¶¨Í¼ÏñµÄ¸ß¶È£¬¼´rows
+#define WIDTH 640 //æŒ‡å®šå›¾åƒçš„å®½åº¦ï¼Œå³cols
+#define HEIGHT 512 //æŒ‡å®šå›¾åƒçš„é«˜åº¦ï¼Œå³rows
 
 /**
-* @brief ¶ÁÈ¡Ğ£ÕıºóµÄºìÍâÍ¼Ïñ²¢´æ´¢ÎªCV::MAT(CV_16UC1)
-* @param[in] file_path Í¼ÏñÎÄ¼şµÄÂ·¾¶
-* @return image CV_16UC1¸ñÊ½Í¼Ïñ
+* @brief è¯»å–æ ¡æ­£åçš„çº¢å¤–å›¾åƒå¹¶å­˜å‚¨ä¸ºCV::MAT(CV_16UC1)
+* @param[in] file_path å›¾åƒæ–‡ä»¶çš„è·¯å¾„
+* @return image CV_16UC1æ ¼å¼å›¾åƒ
 */
 Mat readImageFromRaw(std::string file_path) {
-	FILE* fpsrc = NULL;  //¶ÁÈëÎÄ¼şÖ¸Õë
-	uint16_t* src = new uint16_t[WIDTH * HEIGHT];  //¶ÁÈë
+	FILE* fpsrc = NULL;  //è¯»å…¥æ–‡ä»¶æŒ‡é’ˆ
+	uint16_t* src = new uint16_t[WIDTH * HEIGHT];  //è¯»å…¥
 
 	const char* filenamechar = file_path.c_str();
 	if ((fpsrc = fopen(filenamechar, "rb")) == NULL)
@@ -32,7 +32,7 @@ Mat readImageFromRaw(std::string file_path) {
 
 	fread(src, sizeof(uint16_t), WIDTH * HEIGHT, fpsrc);
 
-	//construct opencv mat and show image Size()ÏÈÁĞºóĞĞ,¼´ÏÈ¿íºó¸ß
+	//construct opencv mat and show image Size()å…ˆåˆ—åè¡Œ,å³å…ˆå®½åé«˜
 	cv::Mat image(cv::Size(WIDTH, HEIGHT), CV_16UC1, src);
 	fclose(fpsrc);
 
@@ -40,7 +40,7 @@ Mat readImageFromRaw(std::string file_path) {
 }
 
 Mat readImageFromY16(std::string file_path) {
-	// ×¢Òâ£¬ÕâÀïÒªÖ¸¶¨binary¶ÁÈ¡Ä£Ê½
+	// æ³¨æ„ï¼Œè¿™é‡Œè¦æŒ‡å®šbinaryè¯»å–æ¨¡å¼
 	std::ifstream fin;
 	fin.open(file_path, std::ios::binary);
 	if (!fin) {
@@ -49,25 +49,25 @@ Mat readImageFromY16(std::string file_path) {
 
 	// load buffer
 	char* buffer = new char[WIDTH * HEIGHT * 2];
-	// readº¯Êı¶ÁÈ¡£¨¿½±´£©Á÷ÖĞµÄlength¸ö×Ö½Úµ½buffer
+	// readå‡½æ•°è¯»å–ï¼ˆæ‹·è´ï¼‰æµä¸­çš„lengthä¸ªå­—èŠ‚åˆ°buffer
 	fin.read(buffer, WIDTH * HEIGHT * 2);
 
-	// construct opencv mat and show image Size()ÏÈÁĞºóĞĞ,¼´ÏÈ¿íºó¸ß
+	// construct opencv mat and show image Size()å…ˆåˆ—åè¡Œ,å³å…ˆå®½åé«˜
 	cv::Mat image(cv::Size(WIDTH, HEIGHT), CV_16UC1);
 
 	uint16_t* p_img;
 
-	//ÏÈÉú³É¿ÕµÄÄ¿±êÍ¼Æ¬,ÏÈĞĞºóÁĞ£¬¼´ÏÈ¸ßºó¿í
+	//å…ˆç”Ÿæˆç©ºçš„ç›®æ ‡å›¾ç‰‡,å…ˆè¡Œååˆ—ï¼Œå³å…ˆé«˜åå®½
 	//Mat dst = Mat::zeros(image.rows, image.cols, CV_16UC1);
 
 	for (int i = 0; i < image.rows; i++)
 	{
-		p_img = image.ptr<uint16_t>(i);//»ñÈ¡Ã¿ĞĞÊ×µØÖ·
+		p_img = image.ptr<uint16_t>(i);//è·å–æ¯è¡Œé¦–åœ°å€
 		for (int j = 0; j < image.cols; ++j)
 		{
-			//½»»»´óĞ¡¶ËÄ£Ê½
+			//äº¤æ¢å¤§å°ç«¯æ¨¡å¼
 			unsigned char a[2] = { buffer[(i * image.cols + j) * 2 + 1], buffer[(i * image.cols + j) * 2] };
-			//Ö¸ÕëÇ¿ÖÆ×ª»»
+			//æŒ‡é’ˆå¼ºåˆ¶è½¬æ¢
 			short result = *((short*)a);
 
 			p_img[j] = result + 8192;
@@ -78,31 +78,31 @@ Mat readImageFromY16(std::string file_path) {
 		}
 	}
 
-	//flip(image, image, -1); //Ğı×ª180¶È
+	//flip(image, image, -1); //æ—‹è½¬180åº¦
 	return image;
 }
 
 
 /**
-* @brief ½«16Î»Í¼ÏñÑ¹ËõÎ»8Î»Í¼Ïñ
-* @param[in] src 16Î»ushort¸ñÊ½Í¼Ïñ
-* @param[in] dst 8Î»uchar¸ñÊ½Í¼Ïñ
+* @brief å°†16ä½å›¾åƒå‹ç¼©ä½8ä½å›¾åƒ
+* @param[in] src 16ä½ushortæ ¼å¼å›¾åƒ
+* @param[in] dst 8ä½ucharæ ¼å¼å›¾åƒ
 */
 void imageCompress(Mat& src, Mat& dst) {
-	//ÏÈÉú³É¿ÕµÄÄ¿±êÍ¼Æ¬,ÏÈĞĞºóÁĞ£¬¼´ÏÈ¸ßºó¿í
+	//å…ˆç”Ÿæˆç©ºçš„ç›®æ ‡å›¾ç‰‡,å…ˆè¡Œååˆ—ï¼Œå³å…ˆé«˜åå®½
 	dst = Mat::zeros(src.rows, src.cols, CV_8UC1);
 	double minv = 0.0, maxv = 0.0;
 	double* minp = &minv;
 	double* maxp = &maxv;
-	//È¡µÃÏñËØÖµ×î´óÖµºÍ×îĞ¡Öµ
+	//å–å¾—åƒç´ å€¼æœ€å¤§å€¼å’Œæœ€å°å€¼
 	minMaxIdx(src, minp, maxp);
 
-	//¶Ô16Î»¸ñÊ½µÄÊı¾İ½øĞĞÑ¹Ëõ,ÓÃÖ¸Õë·ÃÎÊÏñËØ£¬ËÙ¶È¸ü¿ì
+	//å¯¹16ä½æ ¼å¼çš„æ•°æ®è¿›è¡Œå‹ç¼©,ç”¨æŒ‡é’ˆè®¿é—®åƒç´ ï¼Œé€Ÿåº¦æ›´å¿«
 	ushort* p_img;
 	uchar* p_dst;
 	for (int i = 0; i < src.rows; i++)
 	{
-		p_img = src.ptr<ushort>(i);//»ñÈ¡Ã¿ĞĞÊ×µØÖ·
+		p_img = src.ptr<ushort>(i);//è·å–æ¯è¡Œé¦–åœ°å€
 		p_dst = dst.ptr<uchar>(i);
 		for (int j = 0; j < src.cols; ++j)
 		{
@@ -117,82 +117,7 @@ void imageCompress(Mat& src, Mat& dst) {
 //2009
 void Xuzedong_CE(const cv::Mat& src, cv::Mat& dst, int threshold = 5, double alpha = 20, int g = 10)
 {
-	int rows = src.rows;
-	int cols = src.cols;
-	int channels = src.channels();
-	int total_pixels = rows * cols;
-
-	cv::Mat L;
-	L = src.clone();
-	
-	std::vector<int> hist(256, 0);
-
-	//Í³¼ÆºóÏò²î·Ö
-	int k = 0;
-	int count = 0;
-	for (int r = 0; r < rows; r++) {
-		const uchar* data = L.ptr<uchar>(r);
-		for (int c = 0; c < cols; c++) {
-			int diff = (c < 2) ? data[c] : std::abs(data[c] - data[c - 2]);
-			k += diff;
-			if (diff > threshold) {
-				hist[data[c]]++;
-				count++;
-			}
-		}
-	}
-
-	//ÇóĞŞ¸ÄÖ±·½Í¼
-	double kg = k * g;
-	double k_prime = kg / std::pow(2, std::ceil(std::log2(kg)));
-	
-	//double umin = 10;
-	//double u = std::min(count / 256.0, umin);
-	double u = count / 256.0;
-	std::vector<double> modified_hist(256, 0);
-	double sum = 0;
-	for (int i = 0; i < 256; i++) {
-		modified_hist[i] = std::round((1 - k_prime) * u + k_prime * hist[i]);
-		sum += modified_hist[i];
-	}
-
-	//ÇóĞŞ¸ÄÖ±·½Í¼µÄPDF
-	double total_pixels_inv = 1.0 / total_pixels;
-	cv::Mat PDF = cv::Mat::zeros(256, 1, CV_64F);
-	for (int i = 0; i < 256; i++) {
-		PDF.at<double>(i) = modified_hist[i] * total_pixels_inv;
-	}
-
-	//ÇóĞŞ¸ÄÖ±·½Í¼µÄPDF_W£¬CDF_W
-	double pdf_min, pdf_max;
-	cv::minMaxLoc(PDF, &pdf_min, &pdf_max);
-	cv::Mat PDF_w = PDF.clone();
-
-	for (int i = 0; i < 256; i++) {
-		PDF_w.at<double>(i) = pdf_max * std::pow((PDF_w.at<double>(i) - pdf_min) / (pdf_max - pdf_min), 0.5);
-	}
-
-	cv::Mat CDF_w = PDF.clone();
-	double culsum = 0;
-	for (int i = 0; i < 256; i++) {
-		culsum += PDF_w.at<double>(i);
-		CDF_w.at<double>(i) = culsum;
-	}
-	CDF_w /= culsum;
-
-	//ÏñËØÖµÓ³Éä
-	//Ê¹ÓÃÆ½Ì¨Ö±·½Í¼¾ùºâ»¯Ğ§¹û±ÈAGC·½·¨¸üºÃ
-	std::vector<uchar> table(256, 0);
-	for (int i = 1; i < 256; i++) {
-
-		//table[i] = cv::saturate_cast<uchar>(255.0 * std::pow(i / 255.0, 1 - CDF_w.at<double>(i)));	
-		table[i] = cv::saturate_cast<uchar>(255.0 * (CDF_w.at<double>(i) - 0.5 * PDF_w.at<double>(i)));
-
-	}
-
-	cv::LUT(L, table, L);
-	dst = L.clone();
-	return;
+	æš‚ä¸å¼€æº
 }
 
 
